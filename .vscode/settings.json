@@ -1,0 +1,6 @@
+{
+  "files.associations": {
+    "*.module": "php",
+    "system_error": "cpp"
+  }
+}
