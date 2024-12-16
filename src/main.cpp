@@ -8,31 +8,30 @@ static const BaseType_t app_cpu = 0;
 static const BaseType_t app_cpu = 1;
 #endif
 
-const int RED = 15;
-const int GREEN = 2;
+// NOTE: GPI13, GPI15, GPIO02, GPIO4 must be reserved. ADC2 is used by Wi-Fi
+
+// const int RED = 15;
+// const int GREEN = 2;
 // const int BLUE = 4;
+// const int BUTTON = 17;
 
-const int BUZZER = 16;
-const int BUTTON = 17;
-const int BUILTIN_LED = 2;
+// const int BUILTIN_LED = 2; 
 
-const int MQ_D0 = 5;
-// const int MQ_A0 = 18; // not ADC pin
-const int MQ_A0 = 4;
+const int BUZZER = 12;
+const int MQ_9 = 36; // A0
 
 int sensorValue = 0;
 const int threshold = 290;
 
-const char *ssid = "stc_wifi_59D4_5G";
+const char *ssid = "stc_wifi_59D4";
 const char *password = "6T6R776ZSV";
 
-void buttonPressed();
 
 void gasSensor(void *parameter)
 {
   while (1)
   {
-    sensorValue = analogRead(MQ_A0);
+    sensorValue = analogRead(MQ_9);
     Serial.println(sensorValue);
     vTaskDelay(500 / portTICK_PERIOD_MS);
   }
@@ -56,24 +55,24 @@ void buzzerSound(void *parameter)
   }
 }
 
-void blinkLed(void *parameter)
-{
-  while (1)
-  {
-    if (sensorValue <= threshold)
-    {
-      digitalWrite(BUILTIN_LED, HIGH);
-      vTaskDelay(500 / portTICK_PERIOD_MS);
-      digitalWrite(BUILTIN_LED, LOW);
-      vTaskDelay(500 / portTICK_PERIOD_MS);
-    }
-    else
-    {
-      digitalWrite(BUILTIN_LED, LOW);
-      vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }
-  }
-}
+// void blinkLed(void *parameter)
+// {
+//   while (1)
+//   {
+//     if (sensorValue <= threshold)
+//     {
+//       digitalWrite(BUILTIN_LED, HIGH);
+//       vTaskDelay(500 / portTICK_PERIOD_MS);
+//       digitalWrite(BUILTIN_LED, LOW);
+//       vTaskDelay(500 / portTICK_PERIOD_MS);
+//     }
+//     else
+//     {
+//       digitalWrite(BUILTIN_LED, LOW);
+//       vTaskDelay(1000 / portTICK_PERIOD_MS);
+//     }
+//   }
+// }
 
 void setup()
 {
@@ -82,10 +81,10 @@ void setup()
   Serial.print(xPortGetCoreID());
   Serial.print(" with priority ");
   Serial.println(uxTaskPriorityGet(NULL));
-  pinMode(BUTTON, INPUT);
+  // pinMode(BUTTON, INPUT);
   // attachInterrupt(digitalPinToInterrupt(BUTTON), buttonPressed, FALLING);
-  pinMode(RED, OUTPUT);
-  pinMode(GREEN, OUTPUT);
+  // pinMode(RED, OUTPUT);
+  // pinMode(GREEN, OUTPUT);
   // pinMode(BLUE, OUTPUT);
   pinMode(BUZZER, OUTPUT);
 
@@ -104,8 +103,8 @@ void setup()
 
   xTaskCreatePinnedToCore(
       gasSensor,     // Function to implement the task
-      "Button Task", // Name of the task
-      1024,          // Stack size in words
+      "Gas Sensor", // Name of the task
+      2048,          // Stack size in words
       NULL,          // Task input parameter
       1,             // Priority of the task
       NULL,          // Task handle.
@@ -121,29 +120,17 @@ void setup()
       NULL,
       app_cpu);
 
-  xTaskCreatePinnedToCore(
-      blinkLed,
-      "Blink LED",
-      1024,
-      NULL,
-      1,
-      NULL,
-      app_cpu);
+  // xTaskCreatePinnedToCore(
+  //     blinkLed,
+  //     "Blink LED",
+  //     1024,
+  //     NULL,
+  //     1,
+  //     NULL,
+  //     app_cpu);
 }
 
 void loop()
 {
-  // Serial.println("RED");
-  // analogWrite(RED, 255);
-  // delay(1000);
-  // Serial.println("Green");
-  // analogWrite(GREEN, 0);
-  // delay(1000);
-}
 
-// put function definitions here:
-
-void buttonPressed()
-{
-  Serial.println("Button Pressed");
 }
